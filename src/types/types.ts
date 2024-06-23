@@ -9,6 +9,8 @@ export type ButtonProps = GenericProps & {
   color?: string;
   text?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+  icon?: React.ReactNode;
+  textClassName?: string;
 };
 
 type InputType =
@@ -40,14 +42,22 @@ export type InputProps<T> = GenericProps & {
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
   type?: InputType;
   value: T;
-  disable?:boolean;
+  disable?: boolean;
 };
 
 export type UserInputDataType = {
-  value: string;
+  amount: string;
   source: string;
   date: Date | string;
   timestamp: number;
   id: string;
   type: string;
+};
+
+export type TransferProps = {
+  totalBalance: number;
+  currentSaving: number;
+  setCurrentSaving: React.Dispatch<React.SetStateAction<number>>;
+  setTotalBalance: React.Dispatch<React.SetStateAction<number>>;
+  setTempSaving: React.Dispatch<React.SetStateAction<number | string>>;
 };

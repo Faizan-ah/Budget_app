@@ -9,13 +9,16 @@ import {
 } from "../utility/utilityMethods";
 import InputModal from "../components/BudgetApp/Modal";
 import { UserInputDataType } from "../types/types";
-import InputTable from "../components/BudgetApp/InputTable";
-import GetInput from "../components/BudgetApp/GetInput";
+import SummaryTable from "../components/BudgetApp/SummaryTable";
+import LabeledInput from "../components/LabeledInput";
 
 const BudgetApp = () => {
   const navigate = useNavigate();
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState<boolean>(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<boolean>(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] =
+    useState<boolean>(false);
+
   const [modalType, setModalType] = useState<string>("");
   const incomeModalToggle = () => {
     setModalType("Income");
@@ -26,13 +29,18 @@ const BudgetApp = () => {
     setIsExpenseModalOpen(!isExpenseModalOpen);
   };
 
+  const transferModalToggle = () => {
+    setModalType("Transfer");
+    setIsTransferModalOpen(!isTransferModalOpen);
+  };
+
   const [income, setIncome] = useState<Array<UserInputDataType>>([]);
   const [expense, setExpense] = useState<Array<UserInputDataType>>([]);
   const [data, setData] = useState<Array<UserInputDataType>>([]);
   const [targetSaving, setTargetSaving] = useState<string>("");
-  const [tempSaving, setTempSaving] = useState<string>("");
+  const [tempSaving, setTempSaving] = useState<number | string>("");
   // state for updating balance on click
-  const [currentSaving, setCurrentSaving] = useState<string>("");
+  const [currentSaving, setCurrentSaving] = useState<number>(0);
 
   const [totalIncome, setTotalIncome] = useState<number>(0);
   const [totalExpense, setTotalExpense] = useState<number>(0);
@@ -40,7 +48,7 @@ const BudgetApp = () => {
 
   const [isTargetDisable, setIsTargetDisable] = useState<boolean>(false);
   const [isSavingDisable, setIsSavingDisable] = useState<boolean>(false);
-  const incomeTitleArray = ["Date", "Amount", "Source"];
+  const incomeTitleArray = ["Date", "Amount", "Source", "Action"];
 
   useEffect(() => {
     setTotalIncome(calculateTotal(income));
@@ -69,6 +77,11 @@ const BudgetApp = () => {
         onClick={expenseModalToggle}
       />
       <ButtonComponent
+        text="Transfer Funds"
+        className="mx-1"
+        onClick={transferModalToggle}
+      />
+      <ButtonComponent
         className="mx-1"
         onClick={() => navigate(routes.overview)}
         color="secondary"
@@ -76,10 +89,12 @@ const BudgetApp = () => {
       />
       <div className="w-50 d-flex row justify-content-center">
         <div className="d-flex align-items-center">
-          <GetInput
+          <LabeledInput
+            parentDivClass="m-2"
             text="Add your target saving"
             forInput="target-saving"
             id="target-saving"
+            placeholder="Enter amount.."
             value={targetSaving}
             type="text"
             disable={isTargetDisable}
@@ -94,10 +109,12 @@ const BudgetApp = () => {
           />
         </div>
         <div className="d-flex align-items-center">
-          <GetInput
+          <LabeledInput
+            parentDivClass="m-2"
             text="Add your current saving"
             forInput="current-saving"
             id="current-saving"
+            placeholder="Enter amount.."
             value={tempSaving}
             type="text"
             onChange={(e) => handleOnlyNumberChange(e, setTempSaving)}
@@ -107,7 +124,7 @@ const BudgetApp = () => {
             text={isSavingDisable ? "Update savings" : "Add savings"}
             style={{ marginTop: "30px" }}
             onClick={() => {
-              setCurrentSaving(tempSaving);
+              setCurrentSaving(Number(tempSaving));
               setIsSavingDisable(!isSavingDisable);
             }}
           />
@@ -115,21 +132,41 @@ const BudgetApp = () => {
       </div>
 
       <InputModal
-        toggle={modalType === "Income" ? incomeModalToggle : expenseModalToggle}
-        modalTitle={`Add ${modalType}`}
+        toggle={
+          modalType === "Income"
+            ? incomeModalToggle
+            : modalType === "Expense"
+            ? expenseModalToggle
+            : transferModalToggle
+        }
+        modalTitle={
+          modalType === "Transfer" ? "Transfer Funds" : `Add ${modalType}`
+        }
         isModalOpen={
-          modalType === "Income" ? isIncomeModalOpen : isExpenseModalOpen
+          modalType === "Income"
+            ? isIncomeModalOpen
+            : modalType === "Expense"
+            ? isExpenseModalOpen
+            : isTransferModalOpen
         }
         id={modalType}
         setData={modalType === "Income" ? setIncome : setExpense}
         data={modalType === "Income" ? income : expense}
+        totalBalance={totalBalance}
+        setTotalBalance={setTotalBalance}
+        currentSaving={currentSaving}
+        setCurrentSaving={setCurrentSaving}
+        setTempSaving={setTempSaving}
       />
-      <InputTable
+      <SummaryTable
         titleArray={incomeTitleArray}
         mergedData={data}
         totalIncome={totalIncome}
         totalExpense={totalExpense}
         balance={totalBalance}
+        setMergedData={setData}
+        setIncome={setIncome}
+        setExpense={setExpense}
       />
     </div>
   );

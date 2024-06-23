@@ -9,6 +9,8 @@ const ButtonComponent = (props: ButtonProps) => {
     style = {},
     text = "Button",
     onClick = () => {},
+    icon,
+    textClassName,
   } = props;
   return (
     <Button
@@ -18,7 +20,8 @@ const ButtonComponent = (props: ButtonProps) => {
       onClick={onClick}
       style={style}
     >
-      {text}
+      {icon}
+      <span className={textClassName}>{text}</span>
     </Button>
   );
 };

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
-import Income from "./IncomeExpenseForm";
-import { UserInputDataType } from "../../types/types";
+import IncomeExpenseForm from "./IncomeExpenseForm";
+import { TransferProps, UserInputDataType } from "../../types/types";
+import TransferForm from "./TransferForm";
 
-type Props = {
+type Props = TransferProps & {
   modalTitle: string;
   toggle: () => void;
   isModalOpen: boolean;
@@ -21,6 +22,11 @@ const InputModal = (props: Props) => {
     id: modalType,
     setData,
     data,
+    totalBalance,
+    currentSaving,
+    setCurrentSaving,
+    setTotalBalance,
+    setTempSaving,
   } = props;
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const onClickModalSuccess = (
@@ -33,14 +39,28 @@ const InputModal = (props: Props) => {
     <Modal id={modalType} isOpen={isModalOpen} toggle={toggle}>
       <ModalHeader>{modalTitle}</ModalHeader>
       <ModalBody>
-        <Income
-          modalType={modalType}
-          data={data}
-          setData={setData}
-          isSubmit={isSubmit}
-          setIsSubmit={setIsSubmit}
-          toggle={toggle}
-        />
+        {modalType === "Transfer" ? (
+          <TransferForm
+            modalType={modalType}
+            toggle={toggle}
+            setIsSubmit={setIsSubmit}
+            isSubmit={isSubmit}
+            totalBalance={totalBalance}
+            currentSaving={currentSaving}
+            setCurrentSaving={setCurrentSaving}
+            setTotalBalance={setTotalBalance}
+            setTempSaving={setTempSaving}
+          />
+        ) : (
+          <IncomeExpenseForm
+            modalType={modalType}
+            data={data}
+            setData={setData}
+            isSubmit={isSubmit}
+            setIsSubmit={setIsSubmit}
+            toggle={toggle}
+          />
+        )}
       </ModalBody>
       <ModalFooter>
         <Button color="primary" onClick={onClickModalSuccess}>

@@ -2,6 +2,7 @@ import React from "react";
 import { Table } from "reactstrap";
 
 import { UserInputDataType } from "../../types/types";
+import ButtonComponent from "../Button";
 
 type Props = {
   titleArray: Array<string>;
@@ -9,10 +10,38 @@ type Props = {
   totalIncome: number;
   totalExpense: number;
   balance: number;
+  setMergedData: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
+  setIncome: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
+  setExpense: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
 };
 
-const InputTable = (props: Props) => {
-  const { titleArray, mergedData, totalIncome, totalExpense, balance } = props;
+const SummaryTable = (props: Props) => {
+  const {
+    titleArray,
+    mergedData,
+    totalIncome,
+    totalExpense,
+    balance,
+    setMergedData,
+    setIncome,
+    setExpense,
+  } = props;
+
+  const deleteRecord = (record: UserInputDataType) => {
+    const updatedArr = mergedData.filter((data) => data.id !== record.id);
+    if (record.type === "Income") {
+      const updatedIncomeArr = mergedData
+        .filter((data) => data.type === "Income")
+        .filter((data) => data.id !== record.id);
+      setIncome(updatedIncomeArr);
+    } else {
+      const updatedExpenseArr = mergedData
+        .filter((data) => data.type === "Expense")
+        .filter((data) => data.id !== record.id);
+      setExpense(updatedExpenseArr);
+    }
+    setMergedData(updatedArr);
+  };
 
   const DisplaySummary = () => {
     return (
@@ -34,6 +63,7 @@ const InputTable = (props: Props) => {
                 : balance}
             </b>
           </td>
+          <td className="bg-light"></td>
         </tr>
       ))
     );
@@ -51,11 +81,21 @@ const InputTable = (props: Props) => {
         </thead>
         <tbody>
           {mergedData?.map((data, index) => (
-            <tr key={index}>
+            <tr className="align-middle" key={index}>
               <th scope="row">{index + 1}</th>
               <td>{data.date.toString()}</td>
               <td>{data.amount}</td>
               <td>{data.source}</td>
+              <td>
+                <ButtonComponent
+                  icon={<i className="bx bx-trash"></i>}
+                  text="Delete"
+                  color="danger"
+                  onClick={() => {
+                    deleteRecord(data);
+                  }}
+                />
+              </td>
             </tr>
           ))}
           <DisplaySummary />
@@ -67,4 +107,4 @@ const InputTable = (props: Props) => {
     </React.Fragment>
   );
 };
-export default InputTable;
+export default SummaryTable;

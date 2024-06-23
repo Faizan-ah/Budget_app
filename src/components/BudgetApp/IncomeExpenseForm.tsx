@@ -1,11 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 
-import GetInput from "./GetInput";
+import LabeledInput from "../LabeledInput";
 import { handleOnlyNumberChange } from "../../utility/utilityMethods";
 import { UserInputDataType } from "../../types/types";
 import { formatDate } from "../../utility/dateUtility";
 
-const Income = (props: {
+const IncomeExpenseForm = (props: {
   data: UserInputDataType[];
   isSubmit: boolean;
   setData: React.Dispatch<React.SetStateAction<UserInputDataType[]>>;
@@ -22,18 +22,14 @@ const Income = (props: {
   const [isAmountDateValid, setIsAmountDateValid] = useState<boolean>(true);
 
   const validate = (): boolean => {
-    if (!amount.trim()) {
-      setIsAmountValid(false);
-      setIsSubmit(false);
-      return false;
-    }
-    if (!amountSource.trim()) {
-      setIsAmountSourceValid(false);
-      setIsSubmit(false);
-      return false;
-    }
-    if (amountDate.toString() === "Invalid Date") {
-      setIsAmountDateValid(false);
+    const isAmountEmpty = !amount.trim();
+    const isAmountSourceEmpty = !amountSource.trim();
+    const isDateInvalid = amountDate.toString() === "Invalid Date";
+
+    if (isAmountEmpty || isAmountSourceEmpty || isDateInvalid) {
+      setIsAmountValid(!isAmountEmpty);
+      setIsAmountSourceValid(!isAmountSourceEmpty);
+      setIsAmountDateValid(!isDateInvalid);
       setIsSubmit(false);
       return false;
     }
@@ -52,28 +48,35 @@ const Income = (props: {
   };
 
   useEffect(() => {
-    if (isSubmit) {
-      if (validate()) {
-        setData([
-          ...data,
-          {
-            amount: modalType.includes("Expense")
-              ? String(-Math.abs(Number(amount)))
-              : String(amount),
-            source: amountSource,
-            date: formatDate(amountDate),
-            timestamp: Date.now(),
-            id: crypto.randomUUID(),
-            type: modalType,
-          },
-        ]);
-        resetStatesAndToggle();
-      }
+    if (!isSubmit) return;
+
+    const handleDataSubmit = () => {
+      const newAmount = modalType.includes("Expense")
+        ? String(-Math.abs(Number(amount)))
+        : String(amount);
+
+      const newData = {
+        amount: newAmount,
+        source: amountSource,
+        date: formatDate(amountDate),
+        timestamp: Date.now(),
+        id: crypto.randomUUID(),
+        type: modalType,
+      };
+
+      setData((prevData) => [...prevData, newData]);
+      resetStatesAndToggle();
+    };
+
+    if (validate()) {
+      handleDataSubmit();
     }
-  }, [isSubmit, amount, amountSource, amountDate]);
+  }, [isSubmit]);
+
   return (
     <React.Fragment>
-      <GetInput
+      <LabeledInput
+        parentDivClass="m-1"
         text={modalType}
         forInput={`${modalType}-input`}
         id={`${modalType}-input`}
@@ -85,9 +88,10 @@ const Income = (props: {
         }
       />
       {!isAmountValid && (
-        <div className="text-danger mx-3">Enter valid {modalType}</div>
+        <div className="text-danger mx-1">Enter valid {modalType}</div>
       )}
-      <GetInput
+      <LabeledInput
+        parentDivClass="m-1"
         text={`${modalType} Source`}
         forInput={`${modalType}-source`}
         id={`${modalType}-source`}
@@ -99,9 +103,10 @@ const Income = (props: {
         }
       />
       {!isAmountSourceValid && (
-        <div className="text-danger mx-3">Enter {modalType} source</div>
+        <div className="text-danger mx-1">Enter {modalType} source</div>
       )}
-      <GetInput
+      <LabeledInput
+        parentDivClass="m-1"
         text="Date"
         forInput={`${modalType}-date`}
         id={`${modalType}-date`}
@@ -111,10 +116,10 @@ const Income = (props: {
         onChange={(e) => setAmountDate(new Date(e.target.value))}
       />
       {!isAmountDateValid && (
-        <div className="text-danger mx-3">Enter valid date</div>
+        <div className="text-danger mx-1">Enter valid date</div>
       )}
     </React.Fragment>
   );
 };
 
-export default Income;
+export default IncomeExpenseForm;
