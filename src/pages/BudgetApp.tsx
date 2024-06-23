@@ -1,59 +1,76 @@
-import { Navigate, useNavigate } from "react-router-dom";
-import { routes } from "../routes/Routes";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import LabelComponent from "../components/Label";
-import InputComponent from "../components/Input";
+import { routes } from "../routes/Routes";
 import ButtonComponent from "../components/Button";
-import {
-  calculateTotalIncome,
-  handleOnlyNumberChange,
-} from "../utility/utilityMethods";
-import { formatDate, formatDateForInputValue } from "../utility/dateUtility";
-import GetInput from "../components/BudgetApp/GetInput";
+import { calculateTotal } from "../utility/utilityMethods";
 import InputModal from "../components/BudgetApp/Modal";
-import { IncomeData } from "../types/types";
-import { Table } from "reactstrap";
+import { UserInputDataType } from "../types/types";
 import InputTable from "../components/BudgetApp/InputTable";
 
 const BudgetApp = () => {
   const navigate = useNavigate();
-  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
+  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState<boolean>(false);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState<boolean>(false);
+  const [modalType, setModalType] = useState<string>("");
   const incomeModalToggle = () => {
+    setModalType("Income");
     setIsIncomeModalOpen(!isIncomeModalOpen);
   };
-  const [income, setIncome] = useState<Array<IncomeData>>([]);
+  const expenseModalToggle = () => {
+    setModalType("Expense");
+    setIsExpenseModalOpen(!isExpenseModalOpen);
+  };
+
+  const [income, setIncome] = useState<Array<UserInputDataType>>([]);
+  const [expense, setExpense] = useState<Array<UserInputDataType>>([]);
+  const [data, setData] = useState<Array<UserInputDataType>>([]);
+
   const [totalIncome, setTotalIncome] = useState<number>(0);
-  const incomeTitleArray = ["Date", "Income", "Income Source"];
+  const [totalExpense, setTotalExpense] = useState<number>(0);
+  const [totalBalance, setTotalBalance] = useState<number>(0);
+
+  const incomeTitleArray = ["Date", "Amount", "Source"];
 
   useEffect(() => {
-    setTotalIncome(calculateTotalIncome(income));
-  }, [totalIncome, income]);
+    setTotalIncome(calculateTotal(income));
+    setTotalExpense(calculateTotal(expense));
+    setTotalBalance(calculateTotal(data));
+  }, [totalIncome, income, totalExpense, expense]);
+
+  useEffect(() => {
+    const mergedData = [...income, ...expense].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+    setData(mergedData);
+  }, [income, expense]);
+
   return (
     <div>
       <h1>Budget App</h1>
-      <ButtonComponent
-        text="Add Income"
-        onClick={() => setIsIncomeModalOpen(!isIncomeModalOpen)}
-      />
+      <ButtonComponent text="Add Income" onClick={incomeModalToggle} />
+      <ButtonComponent text="Add Expense" onClick={expenseModalToggle} />
       <ButtonComponent
         onClick={() => navigate(routes.overview)}
         color="secondary"
         text="To overview"
       />
       <InputModal
-        toggle={incomeModalToggle}
-        modalTitle="Add Income"
-        isModalOpen={isIncomeModalOpen}
-        id="income"
-        setData={setIncome}
-        data={income}
+        toggle={modalType === "Income" ? incomeModalToggle : expenseModalToggle}
+        modalTitle={`Add ${modalType}`}
+        isModalOpen={
+          modalType === "Income" ? isIncomeModalOpen : isExpenseModalOpen
+        }
+        id={modalType}
+        setData={modalType === "Income" ? setIncome : setExpense}
+        data={modalType === "Income" ? income : expense}
       />
-
       <InputTable
         titleArray={incomeTitleArray}
-        data={income}
+        mergedData={data}
         totalIncome={totalIncome}
+        totalExpense={totalExpense}
+        balance={totalBalance}
       />
     </div>
   );

@@ -42,8 +42,11 @@ export type InputProps<T> = GenericProps & {
   value: T;
 };
 
-export type IncomeData = {
-  income: string;
+export type UserInputDataType = {
+  value: string;
   source: string;
   date: Date | string;
+  timestamp: number;
+  id: string;
+  type: string;
 };

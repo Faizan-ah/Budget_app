@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
-import Income from "./Income";
-import { IncomeData } from "../../types/types";
+import Income from "./IncomeExpenseForm";
+import { UserInputDataType } from "../../types/types";
 
 type Props = {
   modalTitle: string;
   toggle: () => void;
   isModalOpen: boolean;
   id: string;
-  setData: React.Dispatch<React.SetStateAction<IncomeData[]>>;
-  data: Array<IncomeData>;
+  setData: React.Dispatch<React.SetStateAction<UserInputDataType[]>>;
+  data: Array<UserInputDataType>;
 };
 
 const InputModal = (props: Props) => {
-  const { modalTitle, toggle, isModalOpen, id, setData, data } = props;
+  const {
+    modalTitle,
+    toggle,
+    isModalOpen,
+    id: modalType,
+    setData,
+    data,
+  } = props;
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const onClickModalSuccess = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -23,10 +30,11 @@ const InputModal = (props: Props) => {
   };
 
   return (
-    <Modal id={id} isOpen={isModalOpen} toggle={toggle}>
+    <Modal id={modalType} isOpen={isModalOpen} toggle={toggle}>
       <ModalHeader>{modalTitle}</ModalHeader>
       <ModalBody>
         <Income
+          modalType={modalType}
           data={data}
           setData={setData}
           isSubmit={isSubmit}

@@ -1,10 +1,9 @@
-import { IncomeData } from "./../types/types";
+import { UserInputDataType } from "./../types/types";
 import { NUMBER_REGEX } from "./Constants";
 
 export const handleOnlyNumberChange = <T>(
   e: React.ChangeEvent<HTMLInputElement>,
   setState: React.Dispatch<React.SetStateAction<T>>,
-  error?: boolean,
   setError?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   if (e.target.value === "" || NUMBER_REGEX.test(e.target.value)) {
@@ -19,8 +18,8 @@ export const handleOnlyNumberChange = <T>(
   }
 };
 
-export const calculateTotalIncome = (incomeData: IncomeData[]) => {
+export const calculateTotal = (incomeData: UserInputDataType[]) => {
   return incomeData.reduce((a, b) => {
-    return Number(a) + Number(b.income);
+    return Number(a) + Number(b.value);
   }, 0);
 };
