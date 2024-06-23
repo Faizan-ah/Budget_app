@@ -11,6 +11,7 @@ const InputComponent = <T,>(props: InputProps<T>) => {
     style = {},
     type = "text",
     onChange = () => {},
+    disable,
   } = props;
 
   const formattedValue =
@@ -27,6 +28,7 @@ const InputComponent = <T,>(props: InputProps<T>) => {
       style={style}
       type={type}
       value={formattedValue}
+      disabled={disable}
     />
   );
 };

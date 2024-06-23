@@ -54,7 +54,7 @@ const InputTable = (props: Props) => {
             <tr key={index}>
               <th scope="row">{index + 1}</th>
               <td>{data.date.toString()}</td>
-              <td>{data.value}</td>
+              <td>{data.amount}</td>
               <td>{data.source}</td>
             </tr>
           ))}

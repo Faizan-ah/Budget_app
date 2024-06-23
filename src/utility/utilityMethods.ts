@@ -20,6 +20,6 @@ export const handleOnlyNumberChange = <T>(
 
 export const calculateTotal = (incomeData: UserInputDataType[]) => {
   return incomeData.reduce((a, b) => {
-    return Number(a) + Number(b.value);
+    return Number(a) + Number(b.amount);
   }, 0);
 };

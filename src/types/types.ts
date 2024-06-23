@@ -40,6 +40,7 @@ export type InputProps<T> = GenericProps & {
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
   type?: InputType;
   value: T;
+  disable?:boolean;
 };
 
 export type UserInputDataType = {

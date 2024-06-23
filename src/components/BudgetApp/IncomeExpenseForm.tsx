@@ -14,32 +14,26 @@ const Income = (props: {
   modalType: string;
 }) => {
   const { data, isSubmit, setData, setIsSubmit, toggle, modalType } = props;
-  const [incomeOrExpense, setIncomeOrExpense] = useState<string>("");
-  const [incomeOrExpenseSource, setIncomeOrExpenseSource] =
-    useState<string>("");
-  const [incomeOrExpenseDate, setIncomeOrExpenseDate] = useState<Date>(
-    new Date()
-  );
-  const [isIncomeOrExpenseValid, setIsIncomeOrExpenseValid] =
-    useState<boolean>(true);
-  const [isIncomeOrExpenseSourceValid, setIsIncomeOrExpenseSourceValid] =
-    useState<boolean>(true);
-  const [isIncomeOrExpenseDateValid, setIsIncomeOrExpenseDateValid] =
-    useState<boolean>(true);
+  const [amount, setAmount] = useState<string>("");
+  const [amountSource, setAmountSource] = useState<string>("");
+  const [amountDate, setAmountDate] = useState<Date>(new Date());
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(true);
+  const [isAmountSourceValid, setIsAmountSourceValid] = useState<boolean>(true);
+  const [isAmountDateValid, setIsAmountDateValid] = useState<boolean>(true);
 
   const validate = (): boolean => {
-    if (!incomeOrExpense.trim()) {
-      setIsIncomeOrExpenseValid(false);
+    if (!amount.trim()) {
+      setIsAmountValid(false);
       setIsSubmit(false);
       return false;
     }
-    if (!incomeOrExpenseSource.trim()) {
-      setIsIncomeOrExpenseSourceValid(false);
+    if (!amountSource.trim()) {
+      setIsAmountSourceValid(false);
       setIsSubmit(false);
       return false;
     }
-    if (incomeOrExpenseDate.toString() === "Invalid Date") {
-      setIsIncomeOrExpenseDateValid(false);
+    if (amountDate.toString() === "Invalid Date") {
+      setIsAmountDateValid(false);
       setIsSubmit(false);
       return false;
     }
@@ -47,12 +41,12 @@ const Income = (props: {
   };
 
   const resetStatesAndToggle = (): void => {
-    setIncomeOrExpense("");
-    setIncomeOrExpenseDate(new Date());
-    setIncomeOrExpenseSource("");
-    setIsIncomeOrExpenseValid(true);
-    setIsIncomeOrExpenseDateValid(true);
-    setIsIncomeOrExpenseSourceValid(true);
+    setAmount("");
+    setAmountDate(new Date());
+    setAmountSource("");
+    setIsAmountValid(true);
+    setIsAmountDateValid(true);
+    setIsAmountSourceValid(true);
     setIsSubmit(false);
     toggle();
   };
@@ -63,11 +57,11 @@ const Income = (props: {
         setData([
           ...data,
           {
-            value: modalType.includes("Expense")
-              ? String(-Math.abs(Number(incomeOrExpense)))
-              : String(incomeOrExpense),
-            source: incomeOrExpenseSource,
-            date: formatDate(incomeOrExpenseDate),
+            amount: modalType.includes("Expense")
+              ? String(-Math.abs(Number(amount)))
+              : String(amount),
+            source: amountSource,
+            date: formatDate(amountDate),
             timestamp: Date.now(),
             id: crypto.randomUUID(),
             type: modalType,
@@ -76,7 +70,7 @@ const Income = (props: {
         resetStatesAndToggle();
       }
     }
-  }, [isSubmit, incomeOrExpense, incomeOrExpenseSource, incomeOrExpenseDate]);
+  }, [isSubmit, amount, amountSource, amountDate]);
   return (
     <React.Fragment>
       <GetInput
@@ -85,16 +79,12 @@ const Income = (props: {
         id={`${modalType}-input`}
         placeholder={`Enter your ${modalType}..`}
         type="text"
-        value={incomeOrExpense}
+        value={amount}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          handleOnlyNumberChange(
-            e,
-            setIncomeOrExpense,
-            setIsIncomeOrExpenseValid
-          )
+          handleOnlyNumberChange(e, setAmount, setIsAmountValid)
         }
       />
-      {!isIncomeOrExpenseValid && (
+      {!isAmountValid && (
         <div className="text-danger mx-3">Enter valid {modalType}</div>
       )}
       <GetInput
@@ -103,12 +93,12 @@ const Income = (props: {
         id={`${modalType}-source`}
         placeholder={`Enter your ${modalType} source..`}
         type="text"
-        value={incomeOrExpenseSource}
+        value={amountSource}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          setIncomeOrExpenseSource(e.target.value)
+          setAmountSource(e.target.value)
         }
       />
-      {!isIncomeOrExpenseSourceValid && (
+      {!isAmountSourceValid && (
         <div className="text-danger mx-3">Enter {modalType} source</div>
       )}
       <GetInput
@@ -117,10 +107,10 @@ const Income = (props: {
         id={`${modalType}-date`}
         placeholder="Enter date.."
         type="date"
-        value={incomeOrExpenseDate}
-        onChange={(e) => setIncomeOrExpenseDate(new Date(e.target.value))}
+        value={amountDate}
+        onChange={(e) => setAmountDate(new Date(e.target.value))}
       />
-      {!isIncomeOrExpenseDateValid && (
+      {!isAmountDateValid && (
         <div className="text-danger mx-3">Enter valid date</div>
       )}
     </React.Fragment>

@@ -13,6 +13,7 @@ const GetInput = <T,>(props: LabelProps & InputProps<T>) => {
     onChange,
     style,
     className,
+    disable,
   } = props;
   return (
     <div className="m-3">
@@ -25,6 +26,7 @@ const GetInput = <T,>(props: LabelProps & InputProps<T>) => {
         className={className}
         value={value}
         onChange={onChange}
+        disable={disable}
       />
     </div>
   );
