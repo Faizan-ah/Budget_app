@@ -52,32 +52,37 @@ const SummaryTable = (props: Props) => {
   };
 
   const DisplaySummary = () => {
+    if (!mergedData || mergedData.length === 0) {
+      return null; // Return null if there is no data
+    }
+
     return (
-      mergedData &&
-      mergedData.length !== 0 &&
-      ["income", "expense", "balance"].map((type, index) => (
-        <tr key={index}>
-          <th className="bg-light" scope="row">
-            Total {type}:
-          </th>
-          <td className="bg-light"></td>
-          <td className="bg-light"></td>
-          <td className="bg-light text-left">
-            <b>
-              {Number(
-                type === "income"
-                  ? totalIncome
-                  : type === "expense"
-                  ? totalExpense
-                  : totalBalance
-              ).toFixed(2)}
-            </b>
-          </td>
-          <td className="bg-light"></td>
-        </tr>
-      ))
+      <>
+        {["income", "expense", "balance"].map((type, index) => (
+          <tr key={index}>
+            <th className="bg-light" scope="row">
+              Total {type}:
+            </th>
+            <td className="bg-light"></td>
+            <td className="bg-light"></td>
+            <td className="bg-light text-left">
+              <b>
+                {Number(
+                  type === "income"
+                    ? totalIncome
+                    : type === "expense"
+                    ? totalExpense
+                    : totalBalance
+                ).toFixed(2)}
+              </b>
+            </td>
+            <td className="bg-light"></td>
+          </tr>
+        ))}
+      </>
     );
   };
+
   return (
     <React.Fragment>
       <Table className="w-50">
