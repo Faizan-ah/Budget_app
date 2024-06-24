@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { CircularProgressbar } from "react-circular-progressbar";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 import { routes } from "../routes/Routes";
 import ButtonComponent from "../components/Button";
@@ -52,7 +52,7 @@ const BudgetApp = () => {
   const [totalBalance, setTotalBalance] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [isTargetDisable, setIsTargetDisable] = useState<boolean>(false);
-  const incomeTitleArray = ["Date", "Amount", "Source", "Action"];
+  const incomeTitleArray = ["Date", "Source", "Amount", "Action"];
 
   useEffect(() => {
     const totalInc = calculateTotal(income);
@@ -79,31 +79,35 @@ const BudgetApp = () => {
     setProgress((Number(currentSaving) / Number(tempTargetSaving)) * 100);
   }, [currentSaving, tempTargetSaving]);
   return (
-    <div>
+    <div className="bg-light bg-gradient mx-auto p-3 h-100 w-sm-100 w-md-75 w-lg-50">
       <ToastContainer />
       <h1>Budget App</h1>
-      <ButtonComponent
-        text="Add Income"
-        className="mx-1"
-        onClick={incomeModalToggle}
-      />
-      <ButtonComponent
-        text="Add Expense"
-        className="mx-1"
-        onClick={expenseModalToggle}
-      />
-      <ButtonComponent
-        text="Transfer Funds"
-        className="mx-1"
-        onClick={transferModalToggle}
-      />
-      <ButtonComponent
-        className="mx-1"
-        onClick={() => navigate(routes.overview)}
-        color="secondary"
-        text="To overview"
-      />
-      <div className="d-flex w-50 align-items-center">
+      <div>
+        <ButtonComponent
+          text="Add Income"
+          className="mx-1"
+          onClick={incomeModalToggle}
+          color="success"
+        />
+        <ButtonComponent
+          text="Add Expense"
+          className="mx-1"
+          onClick={expenseModalToggle}
+          color="danger"
+        />
+        <ButtonComponent
+          text="Transfer Funds"
+          className="mx-1"
+          onClick={transferModalToggle}
+        />
+        <ButtonComponent
+          className="mx-1"
+          onClick={() => navigate(routes.overview)}
+          color="secondary"
+          text="To overview"
+        />
+      </div>
+      <div className="d-flex align-items-center">
         <div className="w-75 d-flex row justify-content-center">
           <div className="d-flex align-items-center">
             <LabeledInput
@@ -169,6 +173,14 @@ const BudgetApp = () => {
                     : Number(targetSaving)
                 }
                 text={` ${currentSaving ? progress.toFixed(0) : 0}% `}
+                background
+                backgroundPadding={6}
+                styles={buildStyles({
+                  backgroundColor: "#94e815",
+                  textColor: "#fff",
+                  pathColor: "#fff",
+                  trailColor: "transparent",
+                })}
               />
             )}
           </div>

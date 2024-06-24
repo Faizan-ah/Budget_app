@@ -59,7 +59,7 @@ const SummaryTable = (props: Props) => {
     return (
       <>
         {["income", "expense", "balance"].map((type, index) => (
-          <tr key={index}>
+          <tr key={index} className="text-center">
             <th className="bg-light" scope="row">
               Total {type}:
             </th>
@@ -85,8 +85,8 @@ const SummaryTable = (props: Props) => {
 
   return (
     <React.Fragment>
-      <Table className="w-50">
-        <thead>
+      <Table className="summary-table">
+        <thead className="text-center">
           <tr>
             <th>#</th>
             {titleArray.map((title, index) => (
@@ -94,30 +94,32 @@ const SummaryTable = (props: Props) => {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="scrollable-tbody">
           {mergedData?.map((data, index) => (
-            <tr className="align-middle" key={index}>
+            <tr className="align-middle text-center" key={index}>
               <th scope="row">{index + 1}</th>
               <td>{data.date.toString()}</td>
+              <td className="mw-50 text-truncate" title={data.source}>
+                {data.source}
+              </td>
               <td>{data.amount}</td>
-              <td>{data.source}</td>
               <td>
                 <ButtonComponent
                   icon={<i className="bx bx-trash"></i>}
                   text="Delete"
                   color="danger"
-                  onClick={() => {
-                    deleteRecord(data);
-                  }}
+                  onClick={() => deleteRecord(data)}
                 />
               </td>
             </tr>
           ))}
-          <DisplaySummary />
         </tbody>
-      </Table>{" "}
+        <tfoot>
+          <DisplaySummary />
+        </tfoot>
+      </Table>
       {mergedData && mergedData.length === 0 && (
-        <h3 className="text-center w-50">No data available</h3>
+        <h3 className="text-center">No data available</h3>
       )}
     </React.Fragment>
   );
