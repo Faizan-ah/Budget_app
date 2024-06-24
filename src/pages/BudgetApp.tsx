@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import { CircularProgressbar } from "react-circular-progressbar";
 
 import { routes } from "../routes/Routes";
 import ButtonComponent from "../components/Button";
@@ -12,7 +14,6 @@ import { UserInputDataType } from "../types/types";
 import SummaryTable from "../components/BudgetApp/SummaryTable";
 import LabeledInput from "../components/LabeledInput";
 import { displayErrorAlert } from "../utility/Alert";
-import { ToastContainer } from "react-toastify";
 import { ERR_ADD_TARGET, ERR_NOT_ENOUGH_BALANCE } from "../utility/Constants";
 
 const BudgetApp = () => {
@@ -40,6 +41,7 @@ const BudgetApp = () => {
   const [income, setIncome] = useState<Array<UserInputDataType>>([]);
   const [expense, setExpense] = useState<Array<UserInputDataType>>([]);
   const [data, setData] = useState<Array<UserInputDataType>>([]);
+  const [tempTargetSaving, setTempTargetSaving] = useState<string>("");
   const [targetSaving, setTargetSaving] = useState<string>("");
   const [tempSaving, setTempSaving] = useState<number | string>("");
   // state for updating balance on click
@@ -48,7 +50,7 @@ const BudgetApp = () => {
   const [totalIncome, setTotalIncome] = useState<number>(0);
   const [totalExpense, setTotalExpense] = useState<number>(0);
   const [totalBalance, setTotalBalance] = useState<number>(0);
-
+  const [progress, setProgress] = useState<number>(0);
   const [isTargetDisable, setIsTargetDisable] = useState<boolean>(false);
   const incomeTitleArray = ["Date", "Amount", "Source", "Action"];
 
@@ -73,6 +75,9 @@ const BudgetApp = () => {
     setData(mergedData);
   }, [income, expense]);
 
+  useEffect(() => {
+    setProgress((Number(currentSaving) / Number(tempTargetSaving)) * 100);
+  }, [currentSaving, tempTargetSaving]);
   return (
     <div>
       <ToastContainer />
@@ -107,21 +112,23 @@ const BudgetApp = () => {
               forInput="target-saving"
               id="target-saving"
               placeholder="Enter amount.."
-              value={targetSaving}
+              value={tempTargetSaving}
               type="text"
               disable={isTargetDisable}
-              onChange={(e) => handleOnlyNumberChange(e, setTargetSaving)}
+              onChange={(e) => handleOnlyNumberChange(e, setTempTargetSaving)}
             />
             <ButtonComponent
               text={isTargetDisable ? "Reset Target" : "Save target"}
               style={{ marginTop: "30px" }}
               onClick={() => {
-                if (!targetSaving.trim()) {
+                if (!tempTargetSaving.trim()) {
                   displayErrorAlert(ERR_ADD_TARGET);
                   return;
                 }
                 setIsTargetDisable(!isTargetDisable);
+                setTargetSaving(tempTargetSaving);
                 if (isTargetDisable) {
+                  setTempTargetSaving("");
                   setTargetSaving("");
                 }
               }}
@@ -152,8 +159,20 @@ const BudgetApp = () => {
             />
           </div>
         </div>
-        <div className="w-50 text-center">
-          <h3>Your Savings: {currentSaving}</h3>
+        <div className="w-50 text-center d-flex flex-column align-items-center">
+          <div className="w-h-100 mt-3">
+            {targetSaving && (
+              <CircularProgressbar
+                value={
+                  currentSaving
+                    ? Number(progress.toFixed(0))
+                    : Number(targetSaving)
+                }
+                text={` ${currentSaving ? progress.toFixed(0) : 0}% `}
+              />
+            )}
+          </div>
+          <h3 className="mt-2">Your Savings: {currentSaving}</h3>
         </div>
       </div>
       <InputModal

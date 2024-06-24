@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import "boxicons";
+import "react-circular-progressbar/dist/styles.css";
 
 import Overview from "./pages/Overview";
 import BudgetApp from "./pages/BudgetApp";
