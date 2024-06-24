@@ -4,6 +4,8 @@ import LabeledInput from "../LabeledInput";
 import { handleOnlyNumberChange } from "../../utility/utilityMethods";
 import { UserInputDataType } from "../../types/types";
 import { formatDate } from "../../utility/dateUtility";
+import { displayErrorAlert } from "../../utility/Alert";
+import { ERR_NOT_ENOUGH_BALANCE } from "../../utility/Constants";
 
 const IncomeExpenseForm = (props: {
   data: UserInputDataType[];
@@ -12,8 +14,17 @@ const IncomeExpenseForm = (props: {
   setIsSubmit: React.Dispatch<React.SetStateAction<boolean>>;
   toggle: () => void;
   modalType: string;
+  totalBalance: number;
 }) => {
-  const { data, isSubmit, setData, setIsSubmit, toggle, modalType } = props;
+  const {
+    data,
+    isSubmit,
+    setData,
+    setIsSubmit,
+    toggle,
+    modalType,
+    totalBalance,
+  } = props;
   const [amount, setAmount] = useState<string>("");
   const [amountSource, setAmountSource] = useState<string>("");
   const [amountDate, setAmountDate] = useState<Date>(new Date());
@@ -51,6 +62,14 @@ const IncomeExpenseForm = (props: {
     if (!isSubmit) return;
 
     const handleDataSubmit = () => {
+      if (
+        modalType.includes("Expense") &&
+        Number(totalBalance) < Number(amount)
+      ) {
+        displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);
+        setIsSubmit(false);
+        return;
+      }
       const newAmount = modalType.includes("Expense")
         ? String(-Math.abs(Number(amount)))
         : String(amount);

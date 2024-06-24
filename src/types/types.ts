@@ -4,7 +4,7 @@ export type GenericProps = {
   style?: object;
 };
 
-export type LabelProps = GenericProps & { text: string; forInput: string };
+export type LabelProps = GenericProps & { text: string; forInput?: string };
 export type ButtonProps = GenericProps & {
   color?: string;
   text?: string;
@@ -59,5 +59,4 @@ export type TransferProps = {
   currentSaving: number;
   setCurrentSaving: React.Dispatch<React.SetStateAction<number>>;
   setTotalBalance: React.Dispatch<React.SetStateAction<number>>;
-  setTempSaving: React.Dispatch<React.SetStateAction<number | string>>;
 };

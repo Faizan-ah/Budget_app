@@ -3,13 +3,16 @@ import { Table } from "reactstrap";
 
 import { UserInputDataType } from "../../types/types";
 import ButtonComponent from "../Button";
+import { calculateTotal } from "../../utility/utilityMethods";
+import { displayErrorAlert } from "../../utility/Alert";
+import { ERR_BALANCE_CANT_BE_NEGATIVE } from "../../utility/Constants";
 
 type Props = {
   titleArray: Array<string>;
   mergedData: Array<UserInputDataType>;
   totalIncome: number;
   totalExpense: number;
-  balance: number;
+  totalBalance: number;
   setMergedData: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
   setIncome: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
   setExpense: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
@@ -21,7 +24,7 @@ const SummaryTable = (props: Props) => {
     mergedData,
     totalIncome,
     totalExpense,
-    balance,
+    totalBalance,
     setMergedData,
     setIncome,
     setExpense,
@@ -29,16 +32,21 @@ const SummaryTable = (props: Props) => {
 
   const deleteRecord = (record: UserInputDataType) => {
     const updatedArr = mergedData.filter((data) => data.id !== record.id);
+    const newTotalBalance = calculateTotal(updatedArr);
+
+    if (newTotalBalance < 0) {
+      displayErrorAlert(ERR_BALANCE_CANT_BE_NEGATIVE);
+      return;
+    }
+
     if (record.type === "Income") {
-      const updatedIncomeArr = mergedData
-        .filter((data) => data.type === "Income")
-        .filter((data) => data.id !== record.id);
-      setIncome(updatedIncomeArr);
+      setIncome((prevIncome) =>
+        prevIncome.filter((data) => data.id !== record.id)
+      );
     } else {
-      const updatedExpenseArr = mergedData
-        .filter((data) => data.type === "Expense")
-        .filter((data) => data.id !== record.id);
-      setExpense(updatedExpenseArr);
+      setExpense((prevExpense) =>
+        prevExpense.filter((data) => data.id !== record.id)
+      );
     }
     setMergedData(updatedArr);
   };
@@ -54,13 +62,15 @@ const SummaryTable = (props: Props) => {
           </th>
           <td className="bg-light"></td>
           <td className="bg-light"></td>
-          <td className="bg-light">
+          <td className="bg-light text-left">
             <b>
-              {type === "income"
-                ? totalIncome
-                : type === "expense"
-                ? totalExpense
-                : balance}
+              {Number(
+                type === "income"
+                  ? totalIncome
+                  : type === "expense"
+                  ? totalExpense
+                  : totalBalance
+              ).toFixed(2)}
             </b>
           </td>
           <td className="bg-light"></td>

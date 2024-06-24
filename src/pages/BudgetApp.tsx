@@ -11,6 +11,9 @@ import InputModal from "../components/BudgetApp/Modal";
 import { UserInputDataType } from "../types/types";
 import SummaryTable from "../components/BudgetApp/SummaryTable";
 import LabeledInput from "../components/LabeledInput";
+import { displayErrorAlert } from "../utility/Alert";
+import { ToastContainer } from "react-toastify";
+import { ERR_ADD_TARGET, ERR_NOT_ENOUGH_BALANCE } from "../utility/Constants";
 
 const BudgetApp = () => {
   const navigate = useNavigate();
@@ -47,14 +50,21 @@ const BudgetApp = () => {
   const [totalBalance, setTotalBalance] = useState<number>(0);
 
   const [isTargetDisable, setIsTargetDisable] = useState<boolean>(false);
-  const [isSavingDisable, setIsSavingDisable] = useState<boolean>(false);
   const incomeTitleArray = ["Date", "Amount", "Source", "Action"];
 
   useEffect(() => {
-    setTotalIncome(calculateTotal(income));
-    setTotalExpense(calculateTotal(expense));
-    setTotalBalance(calculateTotal(data) - Number(currentSaving));
-  }, [totalIncome, income, totalExpense, expense, currentSaving]);
+    const totalInc = calculateTotal(income);
+    const totalExp = calculateTotal(expense);
+    const totalBal = calculateTotal(data) - Number(currentSaving);
+
+    setTotalIncome(totalInc);
+    setTotalExpense(totalExp);
+    setTotalBalance(totalBal);
+
+    if (data.length === 0) {
+      setCurrentSaving(0);
+    }
+  }, [income, expense, data, currentSaving]);
 
   useEffect(() => {
     const mergedData = [...income, ...expense].sort(
@@ -65,6 +75,7 @@ const BudgetApp = () => {
 
   return (
     <div>
+      <ToastContainer />
       <h1>Budget App</h1>
       <ButtonComponent
         text="Add Income"
@@ -87,50 +98,64 @@ const BudgetApp = () => {
         color="secondary"
         text="To overview"
       />
-      <div className="w-50 d-flex row justify-content-center">
-        <div className="d-flex align-items-center">
-          <LabeledInput
-            parentDivClass="m-2"
-            text="Add your target saving"
-            forInput="target-saving"
-            id="target-saving"
-            placeholder="Enter amount.."
-            value={targetSaving}
-            type="text"
-            disable={isTargetDisable}
-            onChange={(e) => handleOnlyNumberChange(e, setTargetSaving)}
-          />
-          <ButtonComponent
-            text={isTargetDisable ? "Reset Target" : "Save target"}
-            style={{ marginTop: "30px" }}
-            onClick={() => {
-              setIsTargetDisable(!isTargetDisable);
-            }}
-          />
+      <div className="d-flex w-50 align-items-center">
+        <div className="w-75 d-flex row justify-content-center">
+          <div className="d-flex align-items-center">
+            <LabeledInput
+              parentDivClass="m-2"
+              text="Add your Target Saving"
+              forInput="target-saving"
+              id="target-saving"
+              placeholder="Enter amount.."
+              value={targetSaving}
+              type="text"
+              disable={isTargetDisable}
+              onChange={(e) => handleOnlyNumberChange(e, setTargetSaving)}
+            />
+            <ButtonComponent
+              text={isTargetDisable ? "Reset Target" : "Save target"}
+              style={{ marginTop: "30px" }}
+              onClick={() => {
+                if (!targetSaving.trim()) {
+                  displayErrorAlert(ERR_ADD_TARGET);
+                  return;
+                }
+                setIsTargetDisable(!isTargetDisable);
+                if (isTargetDisable) {
+                  setTargetSaving("");
+                }
+              }}
+            />
+          </div>
+          <div className="d-flex align-items-center">
+            <LabeledInput
+              parentDivClass="m-2"
+              text="Add to Saving Account"
+              forInput="current-saving"
+              id="current-saving"
+              placeholder="Enter amount.."
+              value={tempSaving}
+              type="text"
+              onChange={(e) => handleOnlyNumberChange(e, setTempSaving)}
+            />
+            <ButtonComponent
+              text={"Add Saving"}
+              style={{ marginTop: "30px" }}
+              onClick={() => {
+                if (Number(totalBalance) >= Number(tempSaving)) {
+                  setCurrentSaving(Number(currentSaving) + Number(tempSaving));
+                } else {
+                  displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);
+                }
+                setTempSaving("");
+              }}
+            />
+          </div>
         </div>
-        <div className="d-flex align-items-center">
-          <LabeledInput
-            parentDivClass="m-2"
-            text="Add your current saving"
-            forInput="current-saving"
-            id="current-saving"
-            placeholder="Enter amount.."
-            value={tempSaving}
-            type="text"
-            onChange={(e) => handleOnlyNumberChange(e, setTempSaving)}
-            disable={isSavingDisable}
-          />
-          <ButtonComponent
-            text={isSavingDisable ? "Update savings" : "Add savings"}
-            style={{ marginTop: "30px" }}
-            onClick={() => {
-              setCurrentSaving(Number(tempSaving));
-              setIsSavingDisable(!isSavingDisable);
-            }}
-          />
+        <div className="w-50 text-center">
+          <h3>Your Savings: {currentSaving}</h3>
         </div>
       </div>
-
       <InputModal
         toggle={
           modalType === "Income"
@@ -156,14 +181,13 @@ const BudgetApp = () => {
         setTotalBalance={setTotalBalance}
         currentSaving={currentSaving}
         setCurrentSaving={setCurrentSaving}
-        setTempSaving={setTempSaving}
       />
       <SummaryTable
         titleArray={incomeTitleArray}
         mergedData={data}
         totalIncome={totalIncome}
         totalExpense={totalExpense}
-        balance={totalBalance}
+        totalBalance={totalBalance}
         setMergedData={setData}
         setIncome={setIncome}
         setExpense={setExpense}

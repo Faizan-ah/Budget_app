@@ -26,7 +26,6 @@ const InputModal = (props: Props) => {
     currentSaving,
     setCurrentSaving,
     setTotalBalance,
-    setTempSaving,
   } = props;
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const onClickModalSuccess = (
@@ -49,7 +48,6 @@ const InputModal = (props: Props) => {
             currentSaving={currentSaving}
             setCurrentSaving={setCurrentSaving}
             setTotalBalance={setTotalBalance}
-            setTempSaving={setTempSaving}
           />
         ) : (
           <IncomeExpenseForm
@@ -59,6 +57,7 @@ const InputModal = (props: Props) => {
             isSubmit={isSubmit}
             setIsSubmit={setIsSubmit}
             toggle={toggle}
+            totalBalance={totalBalance}
           />
         )}
       </ModalBody>
