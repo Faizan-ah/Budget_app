@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "boxicons";
 import "react-circular-progressbar/dist/styles.css";
 
-import Overview from "./pages/Overview";
+import Dashboard from "./pages/Dashboard";
 import BudgetApp from "./pages/BudgetApp";
 import PageNotFound from "./pages/PageNotFound";
 import { routes } from "./routes/Routes";
@@ -14,7 +14,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={routes.overview} index element={<Overview />}></Route>
+        <Route path={routes.dashboard} index element={<Dashboard />}></Route>
         <Route path={routes.budgetApp} element={<BudgetApp />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

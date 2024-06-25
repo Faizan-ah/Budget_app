@@ -117,9 +117,9 @@ const BudgetApp = () => {
         />
         <ButtonComponent
           className="mx-1"
-          onClick={() => navigate(routes.overview)}
+          onClick={() => navigate(routes.dashboard)}
           color="secondary"
-          text="To overview"
+          text="To Dashboard"
         />
       </div>
       <div className="d-flex align-items-center">

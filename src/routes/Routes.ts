@@ -1,4 +1,4 @@
 export const routes = {
-    overview: "/",
-    budgetApp: "/budget-app"
-}
+  dashboard: "/",
+  budgetApp: "/budget-app",
+};
