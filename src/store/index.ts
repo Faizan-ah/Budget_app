@@ -1,7 +1,12 @@
 export const getDataFromLocalStorage = (key: string) => {
-  return JSON.parse(JSON.stringify(localStorage.getItem(key)));
+  const data = localStorage.getItem(key);
+  try {
+    return data ? JSON.parse(data) : null;
+  } catch (e) {
+    return data;
+  }
 };
 
 export const saveDataToLocalStorage = (key: string, data: any) => {
-  return JSON.parse(JSON.stringify(localStorage.setItem(key, data)));
+  return localStorage.setItem(key, JSON.stringify(data));
 };

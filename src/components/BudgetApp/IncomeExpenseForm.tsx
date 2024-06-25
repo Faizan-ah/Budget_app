@@ -6,6 +6,7 @@ import { UserInputDataType } from "../../types/types";
 import { formatDate } from "../../utility/dateUtility";
 import { displayErrorAlert } from "../../utility/Alert";
 import { ERR_NOT_ENOUGH_BALANCE } from "../../utility/Constants";
+import { saveDataToLocalStorage } from "../../store";
 
 const IncomeExpenseForm = (props: {
   data: UserInputDataType[];
@@ -82,8 +83,11 @@ const IncomeExpenseForm = (props: {
         id: crypto.randomUUID(),
         type: modalType,
       };
-
-      setData((prevData) => [...prevData, newData]);
+      setData((prevData) => {
+        const updatedData = [...prevData, newData];
+        saveDataToLocalStorage(`${modalType}-data`, updatedData);
+        return updatedData;
+      });
       resetStatesAndToggle();
     };
 

@@ -6,7 +6,7 @@ const Overview = () => {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <div className="bg-light bg-gradient mx-auto p-3 h-100 w-sm-100 w-md-75 w-lg-50">
       <h1>Overview</h1>
       <ButtonComponent
         onClick={() => navigate(routes.budgetApp)}

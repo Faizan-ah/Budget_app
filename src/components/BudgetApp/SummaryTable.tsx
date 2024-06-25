@@ -6,6 +6,7 @@ import ButtonComponent from "../Button";
 import { calculateTotal } from "../../utility/utilityMethods";
 import { displayErrorAlert } from "../../utility/Alert";
 import { ERR_BALANCE_CANT_BE_NEGATIVE } from "../../utility/Constants";
+import { saveDataToLocalStorage } from "../../store";
 
 type Props = {
   titleArray: Array<string>;
@@ -16,6 +17,7 @@ type Props = {
   setMergedData: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
   setIncome: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
   setExpense: React.Dispatch<React.SetStateAction<Array<UserInputDataType>>>;
+  setCurrentSaving: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const SummaryTable = (props: Props) => {
@@ -28,6 +30,7 @@ const SummaryTable = (props: Props) => {
     setMergedData,
     setIncome,
     setExpense,
+    setCurrentSaving,
   } = props;
 
   const deleteRecord = (record: UserInputDataType) => {
@@ -38,15 +41,21 @@ const SummaryTable = (props: Props) => {
       displayErrorAlert(ERR_BALANCE_CANT_BE_NEGATIVE);
       return;
     }
-
+    const updateStates = (prev: UserInputDataType[]) => {
+      const updated = prev.filter((data) => data.id !== record.id);
+      saveDataToLocalStorage(`${record.type}-data`, updated);
+      return updated;
+    };
     if (record.type === "Income") {
-      setIncome((prevIncome) =>
-        prevIncome.filter((data) => data.id !== record.id)
-      );
+      setIncome((prevIncome) => updateStates(prevIncome));
     } else {
-      setExpense((prevExpense) =>
-        prevExpense.filter((data) => data.id !== record.id)
-      );
+      setExpense((prevExpense) => updateStates(prevExpense));
+    }
+    if (!updatedArr.length) {
+      setCurrentSaving(() => {
+        saveDataToLocalStorage("savings", 0);
+        return 0;
+      });
     }
     setMergedData(updatedArr);
   };

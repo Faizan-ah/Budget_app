@@ -6,6 +6,7 @@ import { TransferProps } from "../../types/types";
 import LabelComponent from "../Label";
 import { displayErrorAlert } from "../../utility/Alert";
 import { ERR_NOT_ENOUGH_BALANCE } from "../../utility/Constants";
+import { saveDataToLocalStorage } from "../../store";
 
 const TransferForm = (
   props: TransferProps & {
@@ -37,7 +38,10 @@ const TransferForm = (
     if (isSubmit) {
       if (Number(totalBalance) + Number(currentSaving) >= Number(tempSaving)) {
         setTotalBalance(tempBalance);
-        setCurrentSaving(tempSaving);
+        setCurrentSaving(() => {
+          saveDataToLocalStorage("savings", tempSaving);
+          return tempSaving;
+        });
         resetStatesAndToggle();
       } else {
         displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);

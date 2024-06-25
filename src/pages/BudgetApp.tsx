@@ -15,6 +15,7 @@ import SummaryTable from "../components/BudgetApp/SummaryTable";
 import LabeledInput from "../components/LabeledInput";
 import { displayErrorAlert } from "../utility/Alert";
 import { ERR_ADD_TARGET, ERR_NOT_ENOUGH_BALANCE } from "../utility/Constants";
+import { getDataFromLocalStorage, saveDataToLocalStorage } from "../store";
 
 const BudgetApp = () => {
   const navigate = useNavigate();
@@ -55,6 +56,23 @@ const BudgetApp = () => {
   const incomeTitleArray = ["Date", "Source", "Amount", "Action"];
 
   useEffect(() => {
+    const incomeArr = getDataFromLocalStorage("Income-data") || [];
+    const expenseArr = getDataFromLocalStorage("Expense-data") || [];
+    const savings = Number(getDataFromLocalStorage("savings")) || 0;
+    const target = getDataFromLocalStorage("target");
+
+    setIncome(incomeArr);
+    setExpense(expenseArr);
+    setCurrentSaving(savings);
+
+    if (target) {
+      setTempTargetSaving(target);
+      setTargetSaving(target);
+      setIsTargetDisable(true);
+    }
+  }, []);
+
+  useEffect(() => {
     const totalInc = calculateTotal(income);
     const totalExp = calculateTotal(expense);
     const totalBal = calculateTotal(data) - Number(currentSaving);
@@ -62,10 +80,6 @@ const BudgetApp = () => {
     setTotalIncome(totalInc);
     setTotalExpense(totalExp);
     setTotalBalance(totalBal);
-
-    if (data.length === 0) {
-      setCurrentSaving(0);
-    }
   }, [income, expense, data, currentSaving]);
 
   useEffect(() => {
@@ -78,6 +92,7 @@ const BudgetApp = () => {
   useEffect(() => {
     setProgress((Number(currentSaving) / Number(tempTargetSaving)) * 100);
   }, [currentSaving, tempTargetSaving]);
+
   return (
     <div className="bg-light bg-gradient mx-auto p-3 h-100 w-sm-100 w-md-75 w-lg-50">
       <ToastContainer />
@@ -130,10 +145,16 @@ const BudgetApp = () => {
                   return;
                 }
                 setIsTargetDisable(!isTargetDisable);
-                setTargetSaving(tempTargetSaving);
+                setTargetSaving(() => {
+                  saveDataToLocalStorage("target", tempTargetSaving);
+                  return tempTargetSaving;
+                });
                 if (isTargetDisable) {
                   setTempTargetSaving("");
-                  setTargetSaving("");
+                  setTargetSaving(() => {
+                    saveDataToLocalStorage("target", "");
+                    return "";
+                  });
                 }
               }}
             />
@@ -154,7 +175,11 @@ const BudgetApp = () => {
               style={{ marginTop: "30px" }}
               onClick={() => {
                 if (Number(totalBalance) >= Number(tempSaving)) {
-                  setCurrentSaving(Number(currentSaving) + Number(tempSaving));
+                  setCurrentSaving((prevSaving) => {
+                    const saving = Number(prevSaving) + Number(tempSaving);
+                    saveDataToLocalStorage("savings", saving);
+                    return saving;
+                  });
                 } else {
                   displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);
                 }
@@ -222,6 +247,7 @@ const BudgetApp = () => {
         setMergedData={setData}
         setIncome={setIncome}
         setExpense={setExpense}
+        setCurrentSaving={setCurrentSaving}
       />
     </div>
   );
