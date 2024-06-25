@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { CSVLink } from "react-csv";
 
 import ButtonComponent from "../components/Button";
 import { routes } from "../routes/Routes";
@@ -9,22 +8,44 @@ import Chart from "../components/Dashboard/Chart";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const DownloadCSV = (): JSX.Element => {
+  const convertToCSV = (objArray: string[][]) => {
+    const array =
+      typeof objArray !== "object" ? JSON.parse(objArray) : objArray;
+    let str = "";
+
+    for (let i = 0; i < array.length; i++) {
+      let line = "";
+      for (let index in array[i]) {
+        if (line !== "") line += ",";
+
+        line += array[i][index];
+      }
+      str += line + "\r\n";
+    }
+    return str;
+  };
+
+  const downloadCSV = () => {
     const income = getDataFromLocalStorage("Income-data") || [];
     const expense = getDataFromLocalStorage("Expense-data") || [];
     const mergedData = [...income, ...expense].sort(
       (a, b) => a.timestamp - b.timestamp
     );
-    const csvData = [
+    const csvDataFormat: string[][] = [
       ["amount", "date", "source"],
-      ...mergedData.map((data) => [data.amount, data.source, data.date]),
+      ...mergedData.map((data) => [data.amount, data.date, data.source]),
     ];
 
-    return (
-      <CSVLink data={csvData}>
-        <ButtonComponent text="Download Statement" color="success" />
-      </CSVLink>
-    );
+    const csvData = new Blob([convertToCSV(csvDataFormat)], {
+      type: "text/csv",
+    });
+    const csvURL = URL.createObjectURL(csvData);
+    const link = document.createElement("a");
+    link.href = csvURL;
+    link.download = `statement.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -36,7 +57,12 @@ const Dashboard = () => {
         className="me-2"
         text="Budget App"
       />
-      <DownloadCSV />
+      <ButtonComponent
+        onClick={downloadCSV}
+        color="success"
+        text="Download Statement"
+      />
+
       <div className="d-flex justify-content-center">
         <Chart />
       </div>
