@@ -1,26 +1,30 @@
 import { useNavigate } from "react-router-dom";
-import { mkConfig, generateCsv, download } from "export-to-csv";
+import { CSVLink } from "react-csv";
 
 import ButtonComponent from "../components/Button";
 import { routes } from "../routes/Routes";
 import { getDataFromLocalStorage } from "../store";
-import { UserInputDataType } from "../types/types";
 import Chart from "../components/Dashboard/Chart";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const csvConfig = mkConfig({ useKeysAsHeaders: true });
 
-  const downloadCSV = () => {
+  const DownloadCSV = (): JSX.Element => {
     const income = getDataFromLocalStorage("Income-data") || [];
     const expense = getDataFromLocalStorage("Expense-data") || [];
-    const mergedData = [...income, ...expense]
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .map((data: UserInputDataType) => {
-        return { amount: data.amount, date: data.date, source: data.source };
-      });
-    const csv = generateCsv(csvConfig)(mergedData as []);
-    download(csvConfig)(csv);
+    const mergedData = [...income, ...expense].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+    const csvData = [
+      ["amount", "date", "source"],
+      ...mergedData.map((data) => [data.amount, data.source, data.date]),
+    ];
+
+    return (
+      <CSVLink data={csvData}>
+        <ButtonComponent text="Download Statement" color="success" />
+      </CSVLink>
+    );
   };
 
   return (
@@ -32,11 +36,7 @@ const Dashboard = () => {
         className="me-2"
         text="Budget App"
       />
-      <ButtonComponent
-        text="Download Statement"
-        color="success"
-        onClick={downloadCSV}
-      />
+      <DownloadCSV />
       <div className="d-flex justify-content-center">
         <Chart />
       </div>
