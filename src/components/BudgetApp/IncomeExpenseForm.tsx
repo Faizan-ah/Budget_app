@@ -36,7 +36,7 @@ const IncomeExpenseForm = (props: {
   const validate = (): boolean => {
     const isAmountEmpty = !amount.trim();
     const isAmountSourceEmpty = !amountSource.trim();
-    const isDateInvalid = amountDate.toString() === "Invalid Date";
+    const isDateInvalid = isNaN(amountDate.getTime());
 
     if (isAmountEmpty || isAmountSourceEmpty || isDateInvalid) {
       setIsAmountValid(!isAmountEmpty);
@@ -58,40 +58,37 @@ const IncomeExpenseForm = (props: {
     setIsSubmit(false);
     toggle();
   };
+  const handleDataSubmit = () => {
+    if (
+      modalType.includes("Expense") &&
+      Number(totalBalance) < Number(amount)
+    ) {
+      displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);
+      setIsSubmit(false);
+      return;
+    }
+    const newAmount = modalType.includes("Expense")
+      ? String(-Math.abs(Number(amount)))
+      : String(amount);
+
+    const newData = {
+      amount: newAmount,
+      source: amountSource,
+      date: formatDate(amountDate),
+      timestamp: Date.now(),
+      id: crypto.randomUUID(),
+      type: modalType,
+    };
+    setData((prevData) => {
+      const updatedData = [...prevData, newData];
+      saveDataToLocalStorage(`${modalType}-data`, updatedData);
+      return updatedData;
+    });
+    resetStatesAndToggle();
+  };
 
   useEffect(() => {
-    if (!isSubmit) return;
-
-    const handleDataSubmit = () => {
-      if (
-        modalType.includes("Expense") &&
-        Number(totalBalance) < Number(amount)
-      ) {
-        displayErrorAlert(ERR_NOT_ENOUGH_BALANCE);
-        setIsSubmit(false);
-        return;
-      }
-      const newAmount = modalType.includes("Expense")
-        ? String(-Math.abs(Number(amount)))
-        : String(amount);
-
-      const newData = {
-        amount: newAmount,
-        source: amountSource,
-        date: formatDate(amountDate),
-        timestamp: Date.now(),
-        id: crypto.randomUUID(),
-        type: modalType,
-      };
-      setData((prevData) => {
-        const updatedData = [...prevData, newData];
-        saveDataToLocalStorage(`${modalType}-data`, updatedData);
-        return updatedData;
-      });
-      resetStatesAndToggle();
-    };
-
-    if (validate()) {
+    if (isSubmit && validate()) {
       handleDataSubmit();
     }
   }, [isSubmit]);
